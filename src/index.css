@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'DM Serif Display', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-cream-50: #FDFCF8;
+  --color-cream-100: #F8F6F0;
+  --color-cream-200: #EDEBE3;
+  --color-terracotta-500: #C9553A;
+  --color-terracotta-600: #B14830;
+  --color-terracotta-700: #963D28;
+  --color-ink-900: #1B1816;
+  --color-ink-700: #3D3833;
+  --color-ink-500: #6B6560;
+  --color-ink-300: #A8A29E;
+  --color-ink-200: #D6D3CE;
+  --color-ink-100: #ECEAE6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-cream-50);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 600px; }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--color-terracotta-500);
+}
+
+input[type="radio"] {
+  accent-color: var(--color-terracotta-500);
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}
