@@ -14,11 +14,11 @@ export default function StepRoles() {
   return (
     <div className="animate-fade-in">
       <h2 className="font-serif text-3xl md:text-4xl text-ink-900 mb-2">
-        Paisaje tipografico
+        Tipos de texto
       </h2>
       <p className="text-ink-500 mb-8 max-w-lg">
-        Selecciona los roles tipograficos que necesitas para tu proyecto.
-        Cada rol recibira su propia configuracion a lo largo del embudo.
+        Selecciona los tipos de texto que necesitas para tu proyecto.
+        Cada tipo de texto recibira su propia configuracion a lo largo del embudo.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -62,7 +62,7 @@ export default function StepRoles() {
 
       {state.roles.length === 0 && (
         <p className="text-sm text-terracotta-500 mt-4">
-          Selecciona al menos un rol para continuar.
+          Selecciona al menos un tipo de texto para continuar.
         </p>
       )}
     </div>

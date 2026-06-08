@@ -6,14 +6,15 @@ export interface RoleOption {
   description: string;
 }
 
+export type EconomicoPrincipal = 'gratuita' | 'con_costo' | 'licencias';
+
 export interface EconomicoData {
-  presupuesto: 'gratuita' | 'con_costo' | '';
+  principales: EconomicoPrincipal[];
+  conCosto: string[];
   licencias: string[];
 }
 
 export interface CompetenciaOrtotipografica {
-  bold: boolean;
-  italica: boolean;
   versalitas: boolean;
   mayusculas: boolean;
   minusculas: boolean;
@@ -32,29 +33,52 @@ export interface CompetenciaFormal {
 }
 
 export interface FormaFuncionRoleData {
-  tono: string;
-  jerarquia: string;
-  volumen: string;
   ortotipografica: CompetenciaOrtotipografica;
   formal: CompetenciaFormal;
 }
 
 export interface TecnicaData {
   compatibilidadMedios: string[];
+  tiposPapel: string[];
   metodoReproduccion: string[];
-  optimizacion: string[];
 }
 
+export const TIPOS_PAPEL = [
+  { id: 'poroso', label: 'Poroso', desc: 'Periodico, reciclado, offset sin estucar' },
+  { id: 'encapado', label: 'Encapado / estucado', desc: 'Couche, satinado, arte' },
+];
+
 export interface EsteticaData {
-  tono: string;
-  estilo: string;
-  epoca: string;
-  personalidadVisual: string;
-  connotaciones: string;
-  maridaje: string;
-  relacionContenido: string;
-  morfologiaTono: string;
+  checklist: string[];
 }
+
+export const ESTETICA_CHECKLIST = [
+  {
+    id: 'relacion_contenido',
+    label: 'Relacion con el contenido',
+    desc: 'La forma tipografica acompania y refuerza el sentido del texto.',
+  },
+  {
+    id: 'connotaciones',
+    label: 'Connotaciones historico-culturales',
+    desc: 'Evoca el periodo, contexto o referencia cultural adecuados.',
+  },
+  {
+    id: 'tono_volumen',
+    label: 'Tono y volumen',
+    desc: 'La presencia visual (discreta o imponente) se ajusta al mensaje.',
+  },
+  {
+    id: 'maridaje',
+    label: 'Maridaje',
+    desc: 'Combina coherentemente con las otras tipografias del sistema.',
+  },
+  {
+    id: 'tipografia_acento',
+    label: 'Tipografia de acento',
+    desc: 'Existe una fuente de apoyo para destacar elementos puntuales.',
+  },
+];
 
 export interface FormState {
   roles: RoleId[];
@@ -73,15 +97,29 @@ export const ROLES: RoleOption[] = [
 
 export const LICENCIAS = [
   { id: 'desktop', label: 'Desktop' },
-  { id: 'webfont', label: 'Estaciones de trabajo (Webfont)' },
-  { id: 'educativa', label: 'Licencia educativa' },
-  { id: 'ong', label: 'Licencia ONG' },
-  { id: 'moviles', label: 'Aplicaciones moviles / Libros' },
-  { id: 'oem', label: 'Licencia OEM' },
+  { id: 'webfont', label: 'Webfont' },
+  { id: 'educativa', label: 'Licenciatura educativa' },
+  { id: 'ong', label: 'Licenciatura ONG' },
+  { id: 'oem', label: 'Licenciatura OEM' },
+  { id: 'moviles', label: 'App moviles / Libros' },
+];
+
+export const CON_COSTO_OPCIONES = [
+  { id: 'distribuciones_grandes', label: 'Distribuciones grandes' },
+  { id: 'subscripcion', label: 'Modelo de subscripcion' },
+  { id: 'compra_directa', label: 'Compra directa' },
+  { id: 'alquiler', label: 'Alquiler' },
+  { id: 'fuentes_medida', label: 'Fuentes a medida' },
+];
+
+export const ECONOMICO_PRINCIPALES: { id: EconomicoPrincipal; label: string; desc: string }[] = [
+  { id: 'gratuita', label: 'Distribucion gratuita', desc: 'Tipografias de libre acceso' },
+  { id: 'con_costo', label: 'Con costo', desc: 'Tipografias comerciales' },
+  { id: 'licencias', label: 'Licencias', desc: 'Requerimientos de licencia de uso' },
 ];
 
 export const STEPS = [
-  { id: 'roles', label: 'Roles', shortLabel: 'Roles' },
+  { id: 'roles', label: 'Tipos de texto', shortLabel: 'Tipos' },
   { id: 'economico', label: 'Plano Economico', shortLabel: 'Economico' },
   { id: 'forma', label: 'Forma y Funcion', shortLabel: 'Forma' },
   { id: 'tecnica', label: 'Plano Tecnico', shortLabel: 'Tecnica' },
@@ -91,12 +129,7 @@ export const STEPS = [
 
 export function createEmptyFormaFuncion(): FormaFuncionRoleData {
   return {
-    tono: '',
-    jerarquia: '',
-    volumen: '',
     ortotipografica: {
-      bold: false,
-      italica: false,
       versalitas: false,
       mayusculas: false,
       minusculas: false,
@@ -119,7 +152,8 @@ export function createInitialState(): FormState {
   return {
     roles: [],
     economico: {
-      presupuesto: '',
+      principales: [],
+      conCosto: [],
       licencias: [],
     },
     formaFuncion: {
@@ -130,18 +164,11 @@ export function createInitialState(): FormState {
     },
     tecnica: {
       compatibilidadMedios: [],
+      tiposPapel: [],
       metodoReproduccion: [],
-      optimizacion: [],
     },
     estetica: {
-      tono: '',
-      estilo: '',
-      epoca: '',
-      personalidadVisual: '',
-      connotaciones: '',
-      maridaje: '',
-      relacionContenido: '',
-      morfologiaTono: '',
+      checklist: [],
     },
   };
 }

@@ -1,17 +1,18 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
-import { type FormState, type RoleId, type FormaFuncionRoleData, createInitialState } from '../types';
+import { type FormState, type RoleId, type FormaFuncionRoleData, type EconomicoPrincipal, createInitialState } from '../types';
 
 type Action =
   | { type: 'SET_ROLES'; roles: RoleId[] }
-  | { type: 'SET_PRESUPUESTO'; value: FormState['economico']['presupuesto'] }
+  | { type: 'TOGGLE_ECON_PRINCIPAL'; value: EconomicoPrincipal }
+  | { type: 'TOGGLE_ECON_CON_COSTO'; value: string }
   | { type: 'TOGGLE_LICENCIA'; licencia: string }
   | { type: 'SET_FORMA_FUNCION'; role: RoleId; data: Partial<FormaFuncionRoleData> }
   | { type: 'SET_ORTOTIPOGRAFICA'; role: RoleId; field: string; value: boolean }
   | { type: 'SET_FORMAL'; role: RoleId; field: string; value: string }
   | { type: 'TOGGLE_TECNICA_MEDIO'; medio: string }
+  | { type: 'TOGGLE_TECNICA_PAPEL'; tipo: string }
   | { type: 'TOGGLE_TECNICA_METODO'; metodo: string }
-  | { type: 'TOGGLE_TECNICA_OPTIMIZACION'; opt: string }
-  | { type: 'SET_ESTETICA'; field: string; value: string }
+  | { type: 'TOGGLE_ESTETICA'; id: string }
   | { type: 'RESET' };
 
 function reducer(state: FormState, action: Action): FormState {
@@ -19,8 +20,23 @@ function reducer(state: FormState, action: Action): FormState {
     case 'SET_ROLES':
       return { ...state, roles: action.roles };
 
-    case 'SET_PRESUPUESTO':
-      return { ...state, economico: { ...state.economico, presupuesto: action.value } };
+    case 'TOGGLE_ECON_PRINCIPAL': {
+      const isOn = state.economico.principales.includes(action.value);
+      const principales = isOn
+        ? state.economico.principales.filter(p => p !== action.value)
+        : [...state.economico.principales, action.value];
+      // Si se deselecciona, limpiar sus sub-opciones
+      const conCosto = isOn && action.value === 'con_costo' ? [] : state.economico.conCosto;
+      const licencias = isOn && action.value === 'licencias' ? [] : state.economico.licencias;
+      return { ...state, economico: { ...state.economico, principales, conCosto, licencias } };
+    }
+
+    case 'TOGGLE_ECON_CON_COSTO': {
+      const conCosto = state.economico.conCosto.includes(action.value)
+        ? state.economico.conCosto.filter(c => c !== action.value)
+        : [...state.economico.conCosto, action.value];
+      return { ...state, economico: { ...state.economico, conCosto } };
+    }
 
     case 'TOGGLE_LICENCIA': {
       const licencias = state.economico.licencias.includes(action.licencia)
@@ -69,10 +85,19 @@ function reducer(state: FormState, action: Action): FormState {
       };
 
     case 'TOGGLE_TECNICA_MEDIO': {
-      const medios = state.tecnica.compatibilidadMedios.includes(action.medio)
+      const isOn = state.tecnica.compatibilidadMedios.includes(action.medio);
+      const medios = isOn
         ? state.tecnica.compatibilidadMedios.filter(m => m !== action.medio)
         : [...state.tecnica.compatibilidadMedios, action.medio];
-      return { ...state, tecnica: { ...state.tecnica, compatibilidadMedios: medios } };
+      const tiposPapel = isOn && action.medio === 'papel' ? [] : state.tecnica.tiposPapel;
+      return { ...state, tecnica: { ...state.tecnica, compatibilidadMedios: medios, tiposPapel } };
+    }
+
+    case 'TOGGLE_TECNICA_PAPEL': {
+      const tipos = state.tecnica.tiposPapel.includes(action.tipo)
+        ? state.tecnica.tiposPapel.filter(t => t !== action.tipo)
+        : [...state.tecnica.tiposPapel, action.tipo];
+      return { ...state, tecnica: { ...state.tecnica, tiposPapel: tipos } };
     }
 
     case 'TOGGLE_TECNICA_METODO': {
@@ -82,15 +107,12 @@ function reducer(state: FormState, action: Action): FormState {
       return { ...state, tecnica: { ...state.tecnica, metodoReproduccion: metodos } };
     }
 
-    case 'TOGGLE_TECNICA_OPTIMIZACION': {
-      const opts = state.tecnica.optimizacion.includes(action.opt)
-        ? state.tecnica.optimizacion.filter(o => o !== action.opt)
-        : [...state.tecnica.optimizacion, action.opt];
-      return { ...state, tecnica: { ...state.tecnica, optimizacion: opts } };
+    case 'TOGGLE_ESTETICA': {
+      const checklist = state.estetica.checklist.includes(action.id)
+        ? state.estetica.checklist.filter(x => x !== action.id)
+        : [...state.estetica.checklist, action.id];
+      return { ...state, estetica: { checklist } };
     }
-
-    case 'SET_ESTETICA':
-      return { ...state, estetica: { ...state.estetica, [action.field]: action.value } };
 
     case 'RESET':
       return createInitialState();

@@ -1,21 +1,15 @@
 import { useForm } from '../../context/FormContext';
+import { TIPOS_PAPEL } from '../../types';
 
 const MEDIOS = [
-  { id: 'papel_poroso', label: 'Papel poroso', desc: 'Periodico, papel reciclado, offset sin estucar' },
-  { id: 'papel_encapado', label: 'Papel encapado/estucado', desc: 'Couche, papel satinado, arte' },
+  { id: 'papel', label: 'Papel', desc: 'Soportes impresos' },
+  { id: 'pantallas', label: 'Pantallas', desc: 'Web, aplicaciones, dispositivos digitales' },
 ];
 
 const METODOS = [
   { id: 'offset', label: 'Offset', desc: 'Impresion litografica para grandes tiradas' },
   { id: 'digital', label: 'Digital', desc: 'Impresion laser o inkjet, tiradas cortas' },
   { id: 'web', label: 'Web / Pantalla', desc: 'Sitios web, aplicaciones, interfaces digitales' },
-];
-
-const OPTIMIZACIONES = [
-  { id: 'cuerpos_pequenos', label: 'Cuerpos pequenos (< 9pt)', desc: 'Legibilidad en tamaños reducidos' },
-  { id: 'cuerpos_grandes', label: 'Cuerpos grandes (display)', desc: 'Titulares y usos a gran escala' },
-  { id: 'pantalla_retina', label: 'Pantallas de alta densidad', desc: 'Retina, 4K y superiores' },
-  { id: 'pantalla_baja', label: 'Pantallas de baja resolucion', desc: 'Monitores estandar, hinting necesario' },
 ];
 
 export default function StepTecnica() {
@@ -66,6 +60,45 @@ export default function StepTecnica() {
               );
             })}
           </div>
+
+          {/* Sub-opciones de Papel */}
+          {state.tecnica.compatibilidadMedios.includes('papel') && (
+            <div className="animate-slide-down mt-4 bg-cream-100 rounded-lg p-5 border border-ink-100">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-500 mb-3">
+                Papel — tipos
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {TIPOS_PAPEL.map(t => {
+                  const checked = state.tecnica.tiposPapel.includes(t.id);
+                  return (
+                    <label
+                      key={t.id}
+                      className={`
+                        flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200
+                        ${checked
+                          ? 'border-terracotta-500 bg-white shadow-sm'
+                          : 'border-ink-200 bg-white hover:border-ink-300'
+                        }
+                      `}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => dispatch({ type: 'TOGGLE_TECNICA_PAPEL', tipo: t.id })}
+                        className="w-4 h-4 rounded mt-0.5"
+                      />
+                      <div>
+                        <span className={`text-sm font-medium ${checked ? 'text-ink-900' : 'text-ink-700'}`}>
+                          {t.label}
+                        </span>
+                        <p className="text-xs text-ink-500 mt-0.5">{t.desc}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Metodo de reproduccion */}
@@ -105,42 +138,6 @@ export default function StepTecnica() {
           </div>
         </section>
 
-        {/* Optimizacion */}
-        <section>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-ink-500 mb-4">
-            Optimizacion para cuerpos y soportes
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {OPTIMIZACIONES.map(opt => {
-              const checked = state.tecnica.optimizacion.includes(opt.id);
-              return (
-                <label
-                  key={opt.id}
-                  className={`
-                    flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all duration-200
-                    ${checked
-                      ? 'border-terracotta-500 bg-white shadow-sm'
-                      : 'border-ink-100 bg-white hover:border-ink-200'
-                    }
-                  `}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => dispatch({ type: 'TOGGLE_TECNICA_OPTIMIZACION', opt: opt.id })}
-                    className="w-4 h-4 rounded mt-0.5"
-                  />
-                  <div>
-                    <span className={`text-sm font-medium ${checked ? 'text-ink-900' : 'text-ink-700'}`}>
-                      {opt.label}
-                    </span>
-                    <p className="text-xs text-ink-500 mt-0.5">{opt.desc}</p>
-                  </div>
-                </label>
-              );
-            })}
-          </div>
-        </section>
       </div>
     </div>
   );
