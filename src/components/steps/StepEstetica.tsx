@@ -8,11 +8,11 @@ export default function StepEstetica() {
   return (
     <div className="animate-fade-in">
       <h2 className="font-serif text-3xl md:text-4xl text-ink-900 mb-2">
-        Plano Estetico
+        Plano Estético
       </h2>
       <p className="text-ink-500 mb-8 max-w-xl">
-        Verifica que las tipograficas candidatas cumplan con estos criterios esteticos.
-        Marca cada item a medida que confirmes que la fuente lo satisface.
+        Verificá que las tipografías candidatas cumplan con estos criterios estéticos.
+        Marcá cada ítem a medida que confirmes que la fuente lo satisface.
       </p>
 
       <div className="flex flex-col gap-3 max-w-2xl">

@@ -3,12 +3,23 @@
 @theme {
   --font-serif: 'DM Serif Display', serif;
   --font-sans: 'Inter', system-ui, sans-serif;
-  --color-cream-50: #FDFCF8;
-  --color-cream-100: #F8F6F0;
-  --color-cream-200: #EDEBE3;
-  --color-terracotta-500: #C9553A;
-  --color-terracotta-600: #B14830;
-  --color-terracotta-700: #963D28;
+
+  /* Backgrounds & soft tints (derived from #BFBCCB) */
+  --color-cream-50: #F7F5F9;
+  --color-cream-100: #ECE5EF;
+  --color-cream-200: #DDD5E2;
+
+  /* Primary accent — brown #784F41 with darker hovers */
+  --color-terracotta-500: #784F41;
+  --color-terracotta-600: #5E3D33;
+  --color-terracotta-700: #3F2920;
+
+  /* Secondary / mauve family */
+  --color-mauve-500: #986C6A;
+  --color-mauve-400: #B399A2;
+  --color-mauve-300: #BFBCCB;
+
+  /* Text & neutrals — kept dark for readable typography */
   --color-ink-900: #1B1816;
   --color-ink-700: #3D3833;
   --color-ink-500: #6B6560;

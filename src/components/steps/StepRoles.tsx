@@ -17,8 +17,8 @@ export default function StepRoles() {
         Tipos de texto
       </h2>
       <p className="text-ink-500 mb-8 max-w-lg">
-        Selecciona los tipos de texto que necesitas para tu proyecto.
-        Cada tipo de texto recibira su propia configuracion a lo largo del embudo.
+        Seleccioná los tipos de texto que necesitás para tu proyecto.
+        Cada tipo de texto recibirá su propia configuración a lo largo del embudo.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -62,7 +62,7 @@ export default function StepRoles() {
 
       {state.roles.length === 0 && (
         <p className="text-sm text-terracotta-500 mt-4">
-          Selecciona al menos un tipo de texto para continuar.
+          Seleccioná al menos un tipo de texto para continuar.
         </p>
       )}
     </div>

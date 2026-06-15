@@ -26,8 +26,8 @@ export default function FunnelIndicator({ currentStep }: Props) {
                 ${isActive
                   ? 'bg-terracotta-500 text-white shadow-md'
                   : isCompleted
-                    ? 'bg-ink-900 text-cream-100'
-                    : 'bg-ink-100 text-ink-500'
+                    ? 'bg-mauve-500 text-cream-50'
+                    : 'bg-mauve-300/40 text-ink-500'
                 }
               `}
             >

@@ -1,52 +1,61 @@
 import { useForm } from '../context/FormContext';
-import { ROLES, LICENCIAS, CON_COSTO_OPCIONES, ECONOMICO_PRINCIPALES, TIPOS_PAPEL, ESTETICA_CHECKLIST, type RoleId, type FormState } from '../types';
+import { ROLES, LICENCIAS, CON_COSTO_OPCIONES, GRATUITA_OPCIONES, ECONOMICO_PRINCIPALES, SOPORTES, METODOS_REPRODUCCION, ESTETICA_CHECKLIST, type RoleId, type FormState } from '../types';
 
 const ORTO_LABELS: Record<string, string> = {
   versalitas: 'Versalitas',
-  mayusculas: 'Mayusculas',
-  minusculas: 'Minusculas',
-  numerosElzevirianos: 'Numeros elzevirianos',
+  mayusculas: 'Mayúsculas',
+  minusculas: 'Minúsculas',
+  numerosElzevirianos: 'Números elzevirianos',
   ligaduras: 'Ligaduras',
-  caracteresMultilingue: 'Caracteres multilingue',
-  numerosFracciones: 'Numeros y fracciones',
+  caracteresMultilingue: 'Caracteres multilingüe',
+  numerosFracciones: 'Números y fracciones',
   signosMonetarios: 'Signos monetarios',
 };
 
-const MEDIO_LABELS: Record<string, string> = {
-  papel: 'Papel',
-  pantallas: 'Pantallas',
-};
-
-const METODO_LABELS: Record<string, string> = {
-  offset: 'Offset',
-  digital: 'Digital',
-  web: 'Web / Pantalla',
-};
+const SOPORTE_LABELS: Record<string, string> = Object.fromEntries(SOPORTES.map(s => [s.id, s.label]));
+const METODO_LABELS: Record<string, string> = Object.fromEntries(METODOS_REPRODUCCION.map(m => [m.id, m.label]));
 
 const FORMAL_LABELS: Record<string, string> = {
   alturaX: 'Altura de x',
   proporcionesHorizontales: 'Proporciones horizontales',
   espaciado: 'Espaciado',
   contraste: 'Contraste',
+  ascendentes: 'Ascendentes',
+  descendentes: 'Descendentes',
 };
+
+function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'proyecto';
+}
 
 function generateMarkdown(state: FormState): string {
   const now = new Date();
   const fecha = now.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const nombre = state.nombreProyecto.trim() || 'Sin nombre';
 
   const principalLabels = state.economico.principales.map(id => ECONOMICO_PRINCIPALES.find(p => p.id === id)?.label ?? id);
+  const gratuitaLabels = state.economico.gratuita.map(id => GRATUITA_OPCIONES.find(g => g.id === id)?.label ?? id);
   const conCostoLabels = state.economico.conCosto.map(id => CON_COSTO_OPCIONES.find(c => c.id === id)?.label ?? id);
   const licLabels = state.economico.licencias.map(id => LICENCIAS.find(l => l.id === id)?.label ?? id);
 
-  let md = `# Brief Tipografico\n\n`;
-  md += `> Generado con Embudo Tipografico — ${fecha}\n\n`;
+  let md = `# Brief Tipográfico — ${nombre}\n\n`;
+  md += `> Generado con Selección Tipográfica — ${fecha}\n\n`;
+  md += `**Proyecto:** ${nombre}\n\n`;
   md += `---\n\n`;
 
-  // Plano Economico
-  md += `## 1. Plano Economico\n\n`;
+  // Plano Económico
+  md += `## 1. Plano Económico\n\n`;
   md += `| Campo | Valor |\n`;
   md += `| --- | --- |\n`;
   md += `| Opciones principales | ${principalLabels.length ? principalLabels.join(', ') : '—'} |\n`;
+  if (state.economico.principales.includes('gratuita')) {
+    md += `| Distribución gratuita — modalidades | ${gratuitaLabels.length ? gratuitaLabels.join(', ') : '—'} |\n`;
+  }
   if (state.economico.principales.includes('con_costo')) {
     md += `| Con costo — modalidades | ${conCostoLabels.length ? conCostoLabels.join(', ') : '—'} |\n`;
   }
@@ -55,8 +64,8 @@ function generateMarkdown(state: FormState): string {
   }
   md += `\n`;
 
-  // Forma y Funcion por rol
-  md += `## 2. Forma y Funcion\n\n`;
+  // Forma y Función por rol
+  md += `## 2. Forma y Función\n\n`;
   if (state.roles.length === 0) {
     md += `_Sin tipos de texto configurados._\n\n`;
   } else {
@@ -68,7 +77,7 @@ function generateMarkdown(state: FormState): string {
       const activeOrto = Object.entries(data.ortotipografica)
         .filter(([, v]) => v)
         .map(([k]) => ORTO_LABELS[k]);
-      md += `**Competencia ortotipografica**\n\n`;
+      md += `**Competencia ortotipográfica**\n\n`;
       if (activeOrto.length > 0) {
         for (const item of activeOrto) md += `- ${item}\n`;
       } else {
@@ -87,29 +96,25 @@ function generateMarkdown(state: FormState): string {
     }
   }
 
-  // Plano Tecnico
-  md += `## 3. Plano Tecnico\n\n`;
-  const medios = state.tecnica.compatibilidadMedios.map(m => MEDIO_LABELS[m] ?? m);
-  const papelTipos = state.tecnica.tiposPapel.map(t => TIPOS_PAPEL.find(p => p.id === t)?.label ?? t);
+  // Plano Técnico
+  md += `## 3. Plano Técnico\n\n`;
+  const soportes = state.tecnica.soporte.map(s => SOPORTE_LABELS[s] ?? s);
   const metodos = state.tecnica.metodoReproduccion.map(m => METODO_LABELS[m] ?? m);
   md += `| Campo | Valor |\n`;
   md += `| --- | --- |\n`;
-  md += `| Compatibilidad con medios | ${medios.length ? medios.join(', ') : '—'} |\n`;
-  if (state.tecnica.compatibilidadMedios.includes('papel')) {
-    md += `| Papel — tipos | ${papelTipos.length ? papelTipos.join(', ') : '—'} |\n`;
-  }
-  md += `| Metodo de reproduccion | ${metodos.length ? metodos.join(', ') : '—'} |\n\n`;
+  md += `| Soporte | ${soportes.length ? soportes.join(', ') : '—'} |\n`;
+  md += `| Método de reproducción | ${metodos.length ? metodos.join(', ') : '—'} |\n\n`;
 
-  // Plano Estetico
-  md += `## 4. Plano Estetico\n\n`;
-  md += `Checklist de criterios cumplidos por las candidatas tipograficas:\n\n`;
+  // Plano Estético
+  md += `## 4. Plano Estético\n\n`;
+  md += `Checklist de criterios cumplidos por las candidatas tipográficas:\n\n`;
   for (const item of ESTETICA_CHECKLIST) {
     const mark = state.estetica.checklist.includes(item.id) ? 'x' : ' ';
     md += `- [${mark}] **${item.label}** — ${item.desc}\n`;
   }
   md += `\n`;
 
-  md += `---\n\n_Documento generado automaticamente. Usa este brief como guia al evaluar candidatas tipograficas._\n`;
+  md += `---\n\n_Documento generado automáticamente. Usá este brief como guía al evaluar candidatas tipográficas._\n`;
 
   return md;
 }
@@ -143,7 +148,7 @@ function RoleCard({ roleId }: { roleId: RoleId }) {
       <div className="space-y-3 text-sm">
         {activeOrto.length > 0 && (
           <div>
-            <span className="text-ink-500 block mb-1">Competencia ortotipografica:</span>
+            <span className="text-ink-500 block mb-1">Competencia ortotipográfica:</span>
             <div className="flex flex-wrap gap-1.5">
               {activeOrto.map(label => (
                 <span key={label} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
@@ -159,9 +164,7 @@ function RoleCard({ roleId }: { roleId: RoleId }) {
             <div className="flex flex-wrap gap-1.5">
               {formalEntries.map(([key, val]) => (
                 <span key={key} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
-                  {key === 'alturaX' ? 'Altura X' :
-                   key === 'proporcionesHorizontales' ? 'Proporcion' :
-                   key === 'espaciado' ? 'Espaciado' : 'Contraste'}: {val}
+                  {FORMAL_LABELS[key] ?? key}: {val}
                 </span>
               ))}
             </div>
@@ -172,41 +175,52 @@ function RoleCard({ roleId }: { roleId: RoleId }) {
   );
 }
 
-export default function Results() {
+export default function Results({ onReset }: { onReset?: () => void }) {
   const { state, dispatch } = useForm();
+  const nombre = state.nombreProyecto.trim();
   const principalLabels = state.economico.principales.map(id => ECONOMICO_PRINCIPALES.find(p => p.id === id)?.label ?? id);
+  const gratuitaLabels = state.economico.gratuita.map(id => GRATUITA_OPCIONES.find(g => g.id === id)?.label ?? id);
   const conCostoLabels = state.economico.conCosto.map(id => CON_COSTO_OPCIONES.find(c => c.id === id)?.label ?? id);
   const licLabels = state.economico.licencias.map(id => LICENCIAS.find(l => l.id === id)?.label ?? id);
+  const showGrat = state.economico.principales.includes('gratuita');
   const showCC = state.economico.principales.includes('con_costo');
   const showLic = state.economico.principales.includes('licencias');
 
+  const slug = slugify(nombre);
+  const baseName = `brief-tipografico-${slug}`;
+
   const handlePrint = () => window.print();
   const handleReset = () => {
-    if (confirm('Esto borrara todos los datos del formulario. Continuar?')) {
+    if (confirm('Esto borrará todos los datos del formulario. ¿Continuar?')) {
       dispatch({ type: 'RESET' });
+      onReset?.();
     }
   };
   const handleDownloadMd = () => {
     const md = generateMarkdown(state);
-    downloadFile('brief-tipografico.md', md, 'text/markdown;charset=utf-8');
+    downloadFile(`${baseName}.md`, md, 'text/markdown;charset=utf-8');
   };
   const handleDownloadJson = () => {
     const json = JSON.stringify(state, null, 2);
-    downloadFile('brief-tipografico.json', json, 'application/json;charset=utf-8');
+    downloadFile(`${baseName}.json`, json, 'application/json;charset=utf-8');
   };
-
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-start justify-between mb-2">
-        <h2 className="font-serif text-3xl md:text-4xl text-ink-900">
-          Brief Tipografico
-        </h2>
+      <div className="flex items-start justify-between mb-2 gap-4 flex-wrap">
+        <div>
+          <h2 className="font-serif text-3xl md:text-4xl text-ink-900">
+            Brief Tipográfico
+          </h2>
+          {nombre && (
+            <p className="font-serif text-lg text-terracotta-600 mt-1">{nombre}</p>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2 no-print justify-end">
           <button
             type="button"
             onClick={handleDownloadMd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-ink-900 rounded-lg hover:bg-ink-700 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-terracotta-500 rounded-lg hover:bg-terracotta-600 transition-colors shadow-sm"
             title="Descargar brief como Markdown con tablas"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -239,15 +253,15 @@ export default function Results() {
         </div>
       </div>
       <p className="text-ink-500 mb-8 max-w-lg">
-        Resumen de todas las especificaciones seleccionadas a lo largo del embudo tipografico.
+        Resumen de todas las especificaciones seleccionadas a lo largo del embudo tipográfico.
       </p>
 
       <div className="space-y-8">
-        {/* Plano Economico */}
+        {/* Plano Económico */}
         <section className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
           <h3 className="font-serif text-xl text-ink-900 mb-3 pb-2 border-b border-ink-100 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-ink-900 text-white text-xs flex items-center justify-center">1</span>
-            Plano Economico
+            <span className="w-6 h-6 rounded-full bg-terracotta-500 text-white text-xs flex items-center justify-center">1</span>
+            Plano Económico
           </h3>
           <div className="space-y-3 text-sm">
             <div>
@@ -262,6 +276,20 @@ export default function Results() {
                 <span className="text-ink-300 text-sm">Ninguna seleccionada</span>
               )}
             </div>
+            {showGrat && (
+              <div>
+                <span className="text-ink-500 block mb-1">Distribución gratuita — modalidades:</span>
+                {gratuitaLabels.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {gratuitaLabels.map(l => (
+                      <span key={l} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">{l}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-ink-300 text-sm">Ninguna seleccionada</span>
+                )}
+              </div>
+            )}
             {showCC && (
               <div>
                 <span className="text-ink-500 block mb-1">Con costo — modalidades:</span>
@@ -293,11 +321,11 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Forma y Funcion por rol */}
+        {/* Forma y Función por rol */}
         <section>
           <h3 className="font-serif text-xl text-ink-900 mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-ink-900 text-white text-xs flex items-center justify-center">2</span>
-            Forma y Funcion
+            <span className="w-6 h-6 rounded-full bg-terracotta-500 text-white text-xs flex items-center justify-center">2</span>
+            Forma y Función
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {state.roles.map(roleId => (
@@ -306,43 +334,28 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Plano Tecnico */}
+        {/* Plano Técnico */}
         <section className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
           <h3 className="font-serif text-xl text-ink-900 mb-3 pb-2 border-b border-ink-100 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-ink-900 text-white text-xs flex items-center justify-center">3</span>
-            Plano Tecnico
+            <span className="w-6 h-6 rounded-full bg-terracotta-500 text-white text-xs flex items-center justify-center">3</span>
+            Plano Técnico
           </h3>
           <div className="space-y-3 text-sm">
             <div>
-              <span className="text-ink-500 block mb-1">Medios:</span>
+              <span className="text-ink-500 block mb-1">Soporte:</span>
               <div className="flex flex-wrap gap-1.5">
-                {state.tecnica.compatibilidadMedios.length > 0
-                  ? state.tecnica.compatibilidadMedios.map(m => (
-                      <span key={m} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
-                        {MEDIO_LABELS[m] ?? m}
+                {state.tecnica.soporte.length > 0
+                  ? state.tecnica.soporte.map(s => (
+                      <span key={s} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
+                        {SOPORTE_LABELS[s] ?? s}
                       </span>
                     ))
                   : <span className="text-ink-300">—</span>
                 }
               </div>
             </div>
-            {state.tecnica.compatibilidadMedios.includes('papel') && (
-              <div>
-                <span className="text-ink-500 block mb-1">Papel — tipos:</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {state.tecnica.tiposPapel.length > 0
-                    ? state.tecnica.tiposPapel.map(t => (
-                        <span key={t} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
-                          {TIPOS_PAPEL.find(p => p.id === t)?.label ?? t}
-                        </span>
-                      ))
-                    : <span className="text-ink-300">—</span>
-                  }
-                </div>
-              </div>
-            )}
             <div>
-              <span className="text-ink-500 block mb-1">Metodos de reproduccion:</span>
+              <span className="text-ink-500 block mb-1">Métodos de reproducción:</span>
               <div className="flex flex-wrap gap-1.5">
                 {state.tecnica.metodoReproduccion.length > 0
                   ? state.tecnica.metodoReproduccion.map(m => (
@@ -357,11 +370,11 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Plano Estetico */}
+        {/* Plano Estético */}
         <section className="bg-white rounded-xl border border-ink-100 p-5 shadow-sm">
           <h3 className="font-serif text-xl text-ink-900 mb-3 pb-2 border-b border-ink-100 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-ink-900 text-white text-xs flex items-center justify-center">4</span>
-            Plano Estetico
+            <span className="w-6 h-6 rounded-full bg-terracotta-500 text-white text-xs flex items-center justify-center">4</span>
+            Plano Estético
           </h3>
           <p className="text-xs text-ink-500 mb-3">Criterios cumplidos por las candidatas:</p>
           <ul className="space-y-2 text-sm">

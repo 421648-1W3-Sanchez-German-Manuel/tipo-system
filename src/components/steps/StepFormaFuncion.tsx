@@ -4,12 +4,12 @@ import { ROLES, type RoleId } from '../../types';
 
 const ORTO_FIELDS = [
   { key: 'versalitas', label: 'Versalitas' },
-  { key: 'mayusculas', label: 'Mayusculas' },
-  { key: 'minusculas', label: 'Minusculas' },
-  { key: 'numerosElzevirianos', label: 'Numeros elzevirianos' },
+  { key: 'mayusculas', label: 'Mayúsculas' },
+  { key: 'minusculas', label: 'Minúsculas' },
+  { key: 'numerosElzevirianos', label: 'Números elzevirianos' },
   { key: 'ligaduras', label: 'Ligaduras (ae, oe, fi, fl, ss)' },
   { key: 'caracteresMultilingue', label: 'Caracteres para diversas lenguas' },
-  { key: 'numerosFracciones', label: 'Numeros y fracciones' },
+  { key: 'numerosFracciones', label: 'Números y fracciones' },
   { key: 'signosMonetarios', label: 'Signos monetarios ($, €, £, etc.)' },
 ];
 
@@ -18,6 +18,8 @@ const FORMAL_OPTIONS = {
   proporcionesHorizontales: { label: 'Proporciones horizontales', options: ['Ancha', 'Media', 'Condensada'] },
   espaciado: { label: 'Espaciado', options: ['Mayor', 'Medio', 'Menor'] },
   contraste: { label: 'Contraste', options: ['Alto', 'Medio', 'Bajo'] },
+  ascendentes: { label: 'Ascendentes', options: ['Corta', 'Media', 'Alta'] },
+  descendentes: { label: 'Descendentes', options: ['Corta', 'Media', 'Alta'] },
 };
 
 export default function StepFormaFuncion() {
@@ -30,10 +32,10 @@ export default function StepFormaFuncion() {
   return (
     <div className="animate-fade-in">
       <h2 className="font-serif text-3xl md:text-4xl text-ink-900 mb-2">
-        Forma y Funcion
+        Forma y Función
       </h2>
       <p className="text-ink-500 mb-6 max-w-lg">
-        Configura las necesidades formales y funcionales para cada tipo de texto.
+        Configurá las necesidades formales y funcionales para cada tipo de texto.
       </p>
 
       {/* Role tabs */}
@@ -57,10 +59,10 @@ export default function StepFormaFuncion() {
       </div>
 
       <div key={activeTab} className="space-y-8 animate-fade-in">
-        {/* Competencia ortotipografica */}
+        {/* Competencia ortotipográfica */}
         <section>
           <h3 className="text-sm font-semibold uppercase tracking-wider text-ink-500 mb-4">
-            Competencia ortotipografica
+            Competencia ortotipográfica
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {ORTO_FIELDS.map(field => {

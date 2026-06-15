@@ -2,21 +2,25 @@ import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import { type FormState, type RoleId, type FormaFuncionRoleData, type EconomicoPrincipal, createInitialState } from '../types';
 
 type Action =
+  | { type: 'SET_NOMBRE_PROYECTO'; nombre: string }
   | { type: 'SET_ROLES'; roles: RoleId[] }
   | { type: 'TOGGLE_ECON_PRINCIPAL'; value: EconomicoPrincipal }
+  | { type: 'TOGGLE_ECON_GRATUITA'; value: string }
   | { type: 'TOGGLE_ECON_CON_COSTO'; value: string }
   | { type: 'TOGGLE_LICENCIA'; licencia: string }
   | { type: 'SET_FORMA_FUNCION'; role: RoleId; data: Partial<FormaFuncionRoleData> }
   | { type: 'SET_ORTOTIPOGRAFICA'; role: RoleId; field: string; value: boolean }
   | { type: 'SET_FORMAL'; role: RoleId; field: string; value: string }
-  | { type: 'TOGGLE_TECNICA_MEDIO'; medio: string }
-  | { type: 'TOGGLE_TECNICA_PAPEL'; tipo: string }
+  | { type: 'TOGGLE_TECNICA_SOPORTE'; soporte: string }
   | { type: 'TOGGLE_TECNICA_METODO'; metodo: string }
   | { type: 'TOGGLE_ESTETICA'; id: string }
   | { type: 'RESET' };
 
 function reducer(state: FormState, action: Action): FormState {
   switch (action.type) {
+    case 'SET_NOMBRE_PROYECTO':
+      return { ...state, nombreProyecto: action.nombre };
+
     case 'SET_ROLES':
       return { ...state, roles: action.roles };
 
@@ -25,10 +29,17 @@ function reducer(state: FormState, action: Action): FormState {
       const principales = isOn
         ? state.economico.principales.filter(p => p !== action.value)
         : [...state.economico.principales, action.value];
-      // Si se deselecciona, limpiar sus sub-opciones
+      const gratuita = isOn && action.value === 'gratuita' ? [] : state.economico.gratuita;
       const conCosto = isOn && action.value === 'con_costo' ? [] : state.economico.conCosto;
       const licencias = isOn && action.value === 'licencias' ? [] : state.economico.licencias;
-      return { ...state, economico: { ...state.economico, principales, conCosto, licencias } };
+      return { ...state, economico: { ...state.economico, principales, gratuita, conCosto, licencias } };
+    }
+
+    case 'TOGGLE_ECON_GRATUITA': {
+      const gratuita = state.economico.gratuita.includes(action.value)
+        ? state.economico.gratuita.filter(g => g !== action.value)
+        : [...state.economico.gratuita, action.value];
+      return { ...state, economico: { ...state.economico, gratuita } };
     }
 
     case 'TOGGLE_ECON_CON_COSTO': {
@@ -84,20 +95,11 @@ function reducer(state: FormState, action: Action): FormState {
         },
       };
 
-    case 'TOGGLE_TECNICA_MEDIO': {
-      const isOn = state.tecnica.compatibilidadMedios.includes(action.medio);
-      const medios = isOn
-        ? state.tecnica.compatibilidadMedios.filter(m => m !== action.medio)
-        : [...state.tecnica.compatibilidadMedios, action.medio];
-      const tiposPapel = isOn && action.medio === 'papel' ? [] : state.tecnica.tiposPapel;
-      return { ...state, tecnica: { ...state.tecnica, compatibilidadMedios: medios, tiposPapel } };
-    }
-
-    case 'TOGGLE_TECNICA_PAPEL': {
-      const tipos = state.tecnica.tiposPapel.includes(action.tipo)
-        ? state.tecnica.tiposPapel.filter(t => t !== action.tipo)
-        : [...state.tecnica.tiposPapel, action.tipo];
-      return { ...state, tecnica: { ...state.tecnica, tiposPapel: tipos } };
+    case 'TOGGLE_TECNICA_SOPORTE': {
+      const soporte = state.tecnica.soporte.includes(action.soporte)
+        ? state.tecnica.soporte.filter(s => s !== action.soporte)
+        : [...state.tecnica.soporte, action.soporte];
+      return { ...state, tecnica: { ...state.tecnica, soporte } };
     }
 
     case 'TOGGLE_TECNICA_METODO': {

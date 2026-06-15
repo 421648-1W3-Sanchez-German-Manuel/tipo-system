@@ -1,20 +1,21 @@
 import { useForm } from '../../context/FormContext';
-import { LICENCIAS, CON_COSTO_OPCIONES, ECONOMICO_PRINCIPALES } from '../../types';
+import { LICENCIAS, CON_COSTO_OPCIONES, GRATUITA_OPCIONES, ECONOMICO_PRINCIPALES } from '../../types';
 
 export default function StepEconomico() {
   const { state, dispatch } = useForm();
-  const { principales, conCosto, licencias } = state.economico;
+  const { principales, gratuita, conCosto, licencias } = state.economico;
 
+  const showGratuita = principales.includes('gratuita');
   const showConCosto = principales.includes('con_costo');
   const showLicencias = principales.includes('licencias');
 
   return (
     <div className="animate-fade-in">
       <h2 className="font-serif text-3xl md:text-4xl text-ink-900 mb-2">
-        Plano Economico
+        Plano Económico
       </h2>
       <p className="text-ink-500 mb-8 max-w-lg">
-        Selecciona las opciones economicas relevantes para tu proyecto. Podes elegir mas de una.
+        Seleccioná las opciones económicas relevantes para tu proyecto. Podés elegir más de una.
       </p>
 
       {/* 3 opciones principales */}
@@ -56,6 +57,42 @@ export default function StepEconomico() {
           );
         })}
       </div>
+
+      {/* Panel: sub-opciones de Distribución gratuita */}
+      {showGratuita && (
+        <section className="animate-slide-down mb-6 bg-cream-100 rounded-lg p-5 border border-ink-100">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-ink-500 mb-4">
+            Distribución gratuita — modalidades
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {GRATUITA_OPCIONES.map(o => {
+              const checked = gratuita.includes(o.id);
+              return (
+                <label
+                  key={o.id}
+                  className={`
+                    flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200
+                    ${checked
+                      ? 'border-terracotta-500 bg-white shadow-sm'
+                      : 'border-ink-200 bg-white hover:border-ink-300'
+                    }
+                  `}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => dispatch({ type: 'TOGGLE_ECON_GRATUITA', value: o.id })}
+                    className="w-4 h-4 rounded"
+                  />
+                  <span className={`text-sm ${checked ? 'text-ink-900 font-medium' : 'text-ink-700'}`}>
+                    {o.label}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Panel: sub-opciones de Con costo */}
       {showConCosto && (
