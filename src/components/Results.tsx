@@ -107,12 +107,12 @@ function generateMarkdown(state: FormState): string {
 
   // Plano Estético
   md += `## 4. Plano Estético\n\n`;
-  md += `Checklist de criterios cumplidos por las candidatas tipográficas:\n\n`;
-  for (const item of ESTETICA_CHECKLIST) {
-    const mark = state.estetica.checklist.includes(item.id) ? 'x' : ' ';
-    md += `- [${mark}] **${item.label}** — ${item.desc}\n`;
-  }
-  md += `\n`;
+  const esteticaLabels = ESTETICA_CHECKLIST
+    .filter(item => state.estetica.checklist.includes(item.id))
+    .map(item => item.label);
+  md += `| Campo | Valor |\n`;
+  md += `| --- | --- |\n`;
+  md += `| Criterios cumplidos | ${esteticaLabels.length ? esteticaLabels.join(', ') : '—'} |\n\n`;
 
   md += `---\n\n_Documento generado automáticamente. Usá este brief como guía al evaluar candidatas tipográficas._\n`;
 
@@ -376,29 +376,24 @@ export default function Results({ onReset }: { onReset?: () => void }) {
             <span className="w-6 h-6 rounded-full bg-terracotta-500 text-white text-xs flex items-center justify-center">4</span>
             Plano Estético
           </h3>
-          <p className="text-xs text-ink-500 mb-3">Criterios cumplidos por las candidatas:</p>
-          <ul className="space-y-2 text-sm">
-            {ESTETICA_CHECKLIST.map(item => {
-              const checked = state.estetica.checklist.includes(item.id);
-              return (
-                <li key={item.id} className="flex items-start gap-2.5">
-                  <span className={`
-                    w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5
-                    ${checked ? 'bg-terracotta-500 border-terracotta-500' : 'border-ink-300'}
-                  `}>
-                    {checked && (
-                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
-                        <path d="M3 7l3 3 5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </span>
-                  <span className={checked ? 'text-ink-900' : 'text-ink-400'}>
-                    {item.label}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <div className="space-y-3 text-sm">
+            <div>
+              <span className="text-ink-500 block mb-1">Criterios cumplidos:</span>
+              {state.estetica.checklist.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {ESTETICA_CHECKLIST
+                    .filter(item => state.estetica.checklist.includes(item.id))
+                    .map(item => (
+                      <span key={item.id} className="px-2 py-0.5 bg-cream-100 text-ink-700 rounded text-xs">
+                        {item.label}
+                      </span>
+                    ))}
+                </div>
+              ) : (
+                <span className="text-ink-300 text-sm">Ninguno seleccionado</span>
+              )}
+            </div>
+          </div>
         </section>
       </div>
     </div>
